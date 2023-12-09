@@ -1,5 +1,6 @@
 import 'package:intl/intl.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:weather_app/helpers/date_time_helper.dart';
 import 'package:weather_app/models/entities/weather_entity.dart';
 
 part 'current_entity.g.dart';
@@ -69,33 +70,4 @@ class CurrentEntity {
   String get hour {
     return DateTime.fromMillisecondsSinceEpoch(dt! * 1000).toStringWith(DateTimeFormater.dateTime);
   }
-}
-
-extension DateTimeExtension on DateTime {
-  String toStringWith(String format) {
-    String formattedDate = DateFormat(format).format(this);
-    return formattedDate;
-  }
-
-  String customOnlyDate({String format = 'dd/MM/yyyy'}) {
-    try {
-      return toStringWith(format);
-    } catch (_) {
-      return '';
-    }
-  }
-}
-
-class DateTimeFormater {
-  /// Dùng để hiển thị
-  static String dateFormatVi = "dd/MM/yyyy";
-  static String dateTimeFormatVi = "dd/MM/yyyy HH:mm:ss";
-  static String dateTimeHour = "HH:mm dd/MM";
-  static String dateTime = "HH:mm";
-
-  /// Format date from server và to server;
-  static String dateTimeFormat = "yyyy-MM-dd";
-  static String dateTimeFormatNormal = "yyyy-MM-dd HH:mm:ss";
-  static String fullDateTimeFormat = "yyyy-MM-dd'T'hh:mm:ss.SSSZ";
-  static String fullDateTimeKPI = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 }

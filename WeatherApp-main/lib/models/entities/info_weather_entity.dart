@@ -1,3 +1,5 @@
+import 'package:weather_app/helpers/date_time_helper.dart';
+
 import 'cloud_entity.dart';
 import 'coord_entity.dart';
 import 'main_entity.dart';
@@ -59,6 +61,6 @@ class InfoWeatherEntity {
   Map<String, dynamic> toJson(InfoWeatherEntity instance) => _$InfoWeatherEntityToJson(this);
 
   String get dateTime {
-    return '';
+    return DateTime.fromMillisecondsSinceEpoch(dt! * 1000).toStringWith(DateTimeFormater.dateTimeHour);
   }
 }
