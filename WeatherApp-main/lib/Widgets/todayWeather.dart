@@ -47,48 +47,38 @@ class TodayWeather extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 15),
-          Container(
-              margin: EdgeInsets.only(
-                bottom: 30,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  ListWeather(),
-                ],
-              )),
+          hourlyList(),
         ],
       ),
     );
   }
 }
 
-class ListWeather extends StatelessWidget {
-  const ListWeather({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(15),
-      decoration: BoxDecoration(
-          border: Border.all(width: 2.5, color: Colors.grey),
-          borderRadius: BorderRadius.circular(35)),
-      child: Column(
-        children: [
-          Text("27°C", style: TextStyle(fontSize: 18, color: Colors.grey)),
-          SizedBox(
-            height: 5,
-          ),
-          Text("anh"),
-          SizedBox(
-            height: 5,
-          ),
-          Text(
-            "12h10",
-            style: TextStyle(fontSize: 16, color: Colors.grey),
-          )
-        ],
-      ),
-    );
-  }
+Widget hourlyList() {
+  return Container(
+    height: 160,
+    padding: const EdgeInsets.only(top: 10, bottom: 10),
+    child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: 4,
+        itemBuilder: (context, index) {
+          return Container(
+            width: 80,
+            margin: const EdgeInsets.only(left: 20, right: 5),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: Colors.grey),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                    "Days"
+                ),
+              ],
+            ),
+          );
+        }),
+  );
 }
