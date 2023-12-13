@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../ultilities/owned_colors.dart';
 import 'detailPage.dart';
+import 'package:intl/intl.dart';
+import 'package:weather_app/bloc/weather_bloc_bloc.dart';
 
 class TodayWeather extends StatelessWidget {
   const TodayWeather({Key? key}) : super(key: key);
@@ -29,8 +31,8 @@ class TodayWeather extends StatelessWidget {
                     onTap: () {
                       Navigator.push(context,
                           MaterialPageRoute(builder: (BuildContext context) {
-                        return DetailPage();
-                      }));
+                            return DetailPage();
+                          }));
                     },
                     child: Text(
                       "7 days",
@@ -56,29 +58,30 @@ class TodayWeather extends StatelessWidget {
 
 Widget hourlyList() {
   return Container(
-    height: 160,
-    padding: const EdgeInsets.only(top: 10, bottom: 10),
-    child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: 4,
-        itemBuilder: (context, index) {
-          return Container(
-            width: 80,
-            margin: const EdgeInsets.only(left: 20, right: 5),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.grey),
+    height: 120,
+    padding: EdgeInsets.all(15),
+    decoration: BoxDecoration(
+      border: Border.all(width: 2, color: Colors.white),
+      borderRadius: BorderRadius.circular(35),
+    ),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: List.generate(4, (index) {
+        return Column(
+          children: [
+            Text(
+              "24 do",
+              style: TextStyle(fontSize: 20, color: Colors.grey),
             ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                    "Days"
-                ),
-              ],
+            SizedBox(height: 10),
+            Text(
+              "12h10",
+              style: TextStyle(fontSize: 16, color: Colors.grey),
             ),
-          );
-        }),
+          ],
+        );
+      }),
+    ),
   );
 }
+

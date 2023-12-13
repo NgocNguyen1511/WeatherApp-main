@@ -54,7 +54,7 @@ class TomorrowWeather extends StatelessWidget {
                     )
                   ],
                 ),
-                Icon(Icons.more_vert, color: Colors.white)
+                // Icon(Icons.more_vert, color: Colors.white)
               ],
             ),
           ),
@@ -68,7 +68,7 @@ class TomorrowWeather extends StatelessWidget {
                   height: MediaQuery.of(context).size.width / 2.3,
                   decoration: BoxDecoration(
                       image: DecorationImage(
-                          image: AssetImage("assets/images/sunny.png"))),
+                          image: AssetImage("assets/1.png"))),
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -89,9 +89,9 @@ class TomorrowWeather extends StatelessWidget {
                                 fontSize: 100, fontWeight: FontWeight.bold),
                           ),
                           Text(
-                            "gi do",
+                            "°C",
                             style: TextStyle(
-                                color: Colors.black54.withOpacity(0.3),
+                                color: Colors.black54,
                                 fontSize: 40,
                                 fontWeight: FontWeight.bold),
                           ),
@@ -101,12 +101,12 @@ class TomorrowWeather extends StatelessWidget {
                     SizedBox(
                       height: 10,
                     ),
-                    Text(
-                      "gi do",
-                      style: TextStyle(
-                        fontSize: 15,
-                      ),
-                    )
+                    // Text(
+                    //   "gi do",
+                    //   style: TextStyle(
+                    //     fontSize: 15,
+                    //   ),
+                    // )
                   ],
                 )
               ],
@@ -159,16 +159,13 @@ class SevenDays extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      "24",
-                      style: TextStyle(fontSize: 20),
+                      "24°C",
+                      style: TextStyle(fontSize: 20,color: Colors.grey),
                     ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Text(
-                      "7 days",
-                      style: TextStyle(fontSize: 20, color: Colors.grey),
-                    )
+                    // Text(
+                    //   "7 days",
+                    //   style: TextStyle(fontSize: 20, color: Colors.grey),
+                    // )
                   ],
                 ));
           }),
