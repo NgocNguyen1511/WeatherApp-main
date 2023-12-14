@@ -152,13 +152,16 @@ class _TomorrowWeatherState extends State<TomorrowWeather> {
                                   ),
                                   Text(
                                     'Nhiệt độ: ${weatherInfo.temperature}°C',
-                                    style: const TextStyle(fontSize: 16),
+                                    style: const TextStyle(
+                                        fontSize: 16,
+                                        color: Color(0xFFCC33CC),
+                                    ),
                                   ),
                                 ],
                               ),
                               Icon(
                                 Icons.cloud,
-                                color: Colors.green
+                                color: Color(0xFF00CC00),
                               ),
                             ],
                           ),

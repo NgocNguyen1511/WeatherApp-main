@@ -135,8 +135,17 @@ class _CurrentWeatherState extends State<CurrentWeather> {
                           children: [
                             Column(
                               children: [
-                                Icon(CupertinoIcons.wind, color: Colors.white),
-                                Text('${snapshot.data!.wind['speed']} Km/h'),
+                                Icon(
+                                    CupertinoIcons.wind,
+                                    color: Colors.white,
+                                    size: 30,
+                                ),
+                                Text(
+                                    '${snapshot.data!.wind['speed']} Km/h',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                    ),
+                                ),
                               ],
                             ),
                             Column(
@@ -146,12 +155,13 @@ class _CurrentWeatherState extends State<CurrentWeather> {
                                   style: TextStyle(
                                     fontWeight: FontWeight.w500,
                                     color: Colors.white,
+                                    fontSize: 20,
                                   ),
                                 ),
                                 Text(
                                   snapshot.data!.weather[0]['main'].toString(),
                                   style: TextStyle(
-                                    fontSize: 15,
+                                    fontSize: 18,
                                   ),
                                 ),
                               ],
@@ -163,12 +173,13 @@ class _CurrentWeatherState extends State<CurrentWeather> {
                                   style: TextStyle(
                                     fontWeight: FontWeight.w500,
                                     color: Colors.white,
+                                    fontSize: 20,
                                   ),
                                 ),
                                 Text(
                                   '${snapshot.data!.main['humidity']}%',
                                   style: TextStyle(
-                                    fontSize: 15,
+                                    fontSize: 18,
                                   ),
                                 ),
                               ],
