@@ -1,14 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_glow/flutter_glow.dart';
 import 'dart:convert' as convert;
 import 'package:http/http.dart' as http;
+import '../models/weather_model.dart';
 import 'package:intl/intl.dart';
-import 'package:weather_app/bloc/weather_bloc_bloc.dart';
-import 'package:weather_app/models/enums/load_status.dart';
 
-import '../models/entities/info_weather_entity.dart';
 
 class CurrentWeather extends StatefulWidget {
   @override
@@ -16,15 +13,25 @@ class CurrentWeather extends StatefulWidget {
 }
 
 class _CurrentWeatherState extends State<CurrentWeather> {
-  InfoWeatherEntity? infoWeatherEntity;
-  LoadStatus loadStatus = LoadStatus.initial;
+  late Future<Weather> myWeather;
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   getDataWeather();
-  // }
+  @override
+  void initState() {
+    super.initState();
+    myWeather = fetchWeather();
+  }
 
+  Future<Weather> fetchWeather() async {
+    final response = await http.get(Uri.parse(
+        "https://api.openweathermap.org/data/2.5/weather?q=HaNoi&units=metric&appid=407fa1e3b2fa2564942ff62581808bd8"));
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> json = convert.jsonDecode(response.body);
+      return Weather.fromJson(json);
+    } else {
+      throw Exception('Không thể tải được dữ liệu...');
+    }
+  }
   String getWeatherImage(int code) {
     if (code >= 200 && code < 300) {
       return 'assets/1.png';
@@ -48,29 +55,30 @@ class _CurrentWeatherState extends State<CurrentWeather> {
   Widget getWeatherIcon(int code) {
     return Image.asset(
       getWeatherImage(code),
-      height: 200,
-      width: 200,
+      height: 250,
+      width: 250,
     );
   }
-
+  DateTime currentDate = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
     return GlowContainer(
-      height: MediaQuery
-          .of(context)
-          .size
-          .height - 230,
+      height: MediaQuery.of(context).size.height - 230,
       margin: EdgeInsets.all(2),
       padding: EdgeInsets.only(top: 50, left: 30, right: 30),
       glowColor: Color(0xff00A1FF).withOpacity(0.5),
       borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(60), bottomRight: Radius.circular(60)),
+        bottomLeft: Radius.circular(60),
+        bottomRight: Radius.circular(60),
+      ),
       color: Color(0xff00A1FF),
       spreadRadius: 5,
-      child: BlocBuilder<WeatherBlocBloc, WeatherBlocState>(
-        builder: (context, state) {
-          if (state is WeatherBlocSuccess) {
+      child: FutureBuilder<Weather>(
+        future: myWeather,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            Weather weather = snapshot.data!;
             return Column(
               children: [
                 Row(
@@ -83,36 +91,28 @@ class _CurrentWeatherState extends State<CurrentWeather> {
                     Row(
                       children: [
                         Text(
-                          "${state.weather.areaName}",
-                          style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
+                          "Ha Noi",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 30,
+                          ),
                         ),
-                        SizedBox(width: 10,),
+                        SizedBox(
+                          width: 10,
+                        ),
                         Icon(CupertinoIcons.map_fill, color: Colors.white),
                       ],
                     ),
-                    // Icon(Icons.more_vert, color: Colors.white)
                   ],
-                ),
-                Container(
-                  margin: EdgeInsets.only(top: 10),
-                  padding: EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                      border: Border.all(width: 1, color: Colors.white),
-                      borderRadius: BorderRadius.circular(30)),
-                  child: Text(
-                    "${state.weather.country}",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
                 ),
                 Container(
                   child: Center(
                     child: Column(
                       children: [
-                        getWeatherIcon(
-                            state.weather.weatherConditionCode!),
+                      getWeatherIcon(snapshot.data!.weather[0]['id']),
+                        // Image.asset("assets/1.png",width: 200,height: 200,),
                         GlowText(
-                          '${state.weather.temperature!.celsius!.round()}°C',
+                          '${snapshot.data!.main['temp']}°C',
                           style: TextStyle(
                             fontSize: 55,
                             fontWeight: FontWeight.bold,
@@ -120,35 +120,53 @@ class _CurrentWeatherState extends State<CurrentWeather> {
                           ),
                         ),
                         Text(
-                          DateFormat('EEEE dd -')
-                              .add_jm()
-                              .format(state.weather.date!),
+                          DateFormat('EEEE dd/MM - hh:mm a').format(currentDate),
                           style: TextStyle(
-                              fontSize: 25,
-                              fontWeight: FontWeight.w500),
+                            fontSize: 25,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                         Divider(
                           color: Colors.white,
                           thickness: 0.9,
                         ),
                         Row(
-                          mainAxisAlignment:
-                          MainAxisAlignment.spaceAround,
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             Column(
                               children: [
                                 Icon(CupertinoIcons.wind, color: Colors.white),
-                                Text(
-                                    '${state.weather.windSpeed} Km/h'),
+                                Text('${snapshot.data!.wind['speed']} Km/h'),
                               ],
                             ),
                             Column(
                               children: [
-                                Text("Status",
-                                  style: TextStyle(fontWeight: FontWeight.w500,
-                                      color: Colors.white),),
                                 Text(
-                                  state.weather.weatherMain!,
+                                  "Status",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                Text(
+                                  snapshot.data!.weather[0]['main'].toString(),
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                Text(
+                                  "Độ ẩm",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                Text(
+                                  '${snapshot.data!.main['humidity']}%',
                                   style: TextStyle(
                                     fontSize: 15,
                                   ),
@@ -163,45 +181,14 @@ class _CurrentWeatherState extends State<CurrentWeather> {
                 ),
               ],
             );
+          } else if (snapshot.hasError) {
+            return Text('Error: ${snapshot.error}');
           } else {
-            return Container();
+            return CircularProgressIndicator();
           }
         },
       ),
     );
   }
 }
-
-  // call API
-//   void getDataWeather() async {
-//     setState(() {
-//       loadStatus = LoadStatus.loading;
-//     });
-//     await Future.delayed(Duration(seconds: 3));
-//     try {
-//       var url = Uri.parse(
-//           'https://api.openweathermap.org/data/2.5/weather?q=HaNoi&units=metric&appid=82d78aef7a2755507e23056a5b7b885f');
-//
-//       var response = await http.get(url);
-//       if (response.statusCode == 200) {
-//         var jsonResponse =
-//             convert.jsonDecode(response.body) as Map<String, dynamic>;
-//
-//         setState(() {
-//           infoWeatherEntity = InfoWeatherEntity.fromJson(jsonResponse);
-//           setState(() {
-//             loadStatus = LoadStatus.success;
-//           });
-//           print('Tên TP ${infoWeatherEntity?.name ?? ''}.');
-//         });
-//       } else {
-//         print('Request failed with status: ${response.statusCode}.');
-//       }
-//     } catch (e) {
-//       setState(() {
-//         loadStatus = LoadStatus.failure;
-//       });
-//     }
-//   }
-// }
 

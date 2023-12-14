@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import '../ultilities/owned_colors.dart';
 import 'detailPage.dart';
-import 'package:intl/intl.dart';
-import 'package:weather_app/bloc/weather_bloc_bloc.dart';
 
 class TodayWeather extends StatelessWidget {
   const TodayWeather({Key? key}) : super(key: key);
@@ -35,7 +32,7 @@ class TodayWeather extends StatelessWidget {
                           }));
                     },
                     child: Text(
-                      "7 days",
+                      "Detail",
                       style: TextStyle(fontSize: 18, color: Colors.grey),
                     ),
                   ),

@@ -1,174 +1,197 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_glow/flutter_glow.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class DetailPage extends StatelessWidget {
-  const DetailPage({super.key});
+  const DetailPage({Key? key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xff030317),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch, // Stretch the column
         children: [
           TomorrowWeather(),
-          SevenDays(),
         ],
       ),
     );
   }
 }
 
-class TomorrowWeather extends StatelessWidget {
+class TomorrowWeather extends StatefulWidget {
+  @override
+  _TomorrowWeatherState createState() => _TomorrowWeatherState();
+}
+
+class _TomorrowWeatherState extends State<TomorrowWeather> {
+  late Future<List<WeatherInfo>> weeklyWeather;
+
+  @override
+  void initState() {
+    super.initState();
+    weeklyWeather = fetchWeeklyWeather();
+  }
+
+  Future<List<WeatherInfo>> fetchWeeklyWeather() async {
+    final response = await http.get(Uri.parse(
+        "https://api.openweathermap.org/data/2.5/forecast?q=HaNoi&units=metric&appid=407fa1e3b2fa2564942ff62581808bd8"));
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+      List<dynamic> list = jsonResponse['list'];
+
+      // Danh sách để lưu trữ thông tin thời tiết cho mỗi ngày
+      List<WeatherInfo> uniqueWeatherList = [];
+
+      for (var weatherJson in list) {
+        WeatherInfo weatherInfo = WeatherInfo.fromJson(weatherJson);
+
+        // Lấy ngày từ thông tin thời tiết
+        String day = weatherInfo.day;
+
+        // Kiểm tra xem ngày đã được thêm vào danh sách chưa
+        if (!uniqueWeatherList.any((element) => element.day == day)) {
+          uniqueWeatherList.add(weatherInfo);
+        }
+      }
+
+      return uniqueWeatherList;
+    } else {
+      throw Exception('Không thể tải thông tin thời tiết hàng tuần');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return GlowContainer(
-      color: Color(0xff00A1FF),
-      glowColor: Color(0xff00A1FF),
-      borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(60), bottomRight: Radius.circular(60)),
-      child: Column(
-        children: [
-          Padding(
-            padding: EdgeInsets.only(top: 50, right: 30, left: 30, bottom: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                GestureDetector(
+    return Expanded(
+      child: GlowContainer(
+        color: Color(0xff00A1FF),
+        glowColor: Color(0xff00A1FF),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(60),
+          bottomRight: Radius.circular(60),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: EdgeInsets.only(top: 50, right: 30, left: 30, bottom: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  GestureDetector(
                     onTap: () {
                       Navigator.pop(context);
                     },
                     child: Icon(
                       Icons.arrow_back_ios,
                       color: Colors.white,
-                    )),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.calendar_today,
-                      color: Colors.white,
                     ),
-                    Text(
-                      " 7 days",
-                      style:
-                      TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-                    )
-                  ],
-                ),
-                // Icon(Icons.more_vert, color: Colors.white)
-              ],
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.all(8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  width: MediaQuery.of(context).size.width / 2.3,
-                  height: MediaQuery.of(context).size.width / 2.3,
-                  decoration: BoxDecoration(
-                      image: DecorationImage(
-                          image: AssetImage("assets/1.png"))),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      "Tomorrow",
-                      style: TextStyle(fontSize: 30, height: 0.1),
-                    ),
-                    Container(
-                      height: 105,
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          GlowText(
-                            "24",
-                            style: TextStyle(
-                                fontSize: 100, fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            "°C",
-                            style: TextStyle(
-                                color: Colors.black54,
-                                fontSize: 40,
-                                fontWeight: FontWeight.bold),
-                          ),
-                        ],
+                  ),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.calendar_today,
+                        color: Colors.white,
                       ),
+                      Text(
+                        " Weakly",
+                        style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold,color: Colors.white),
+                      )
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            FutureBuilder<List<WeatherInfo>>(
+              future: weeklyWeather,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return CircularProgressIndicator();
+                } else if (snapshot.hasError) {
+                  return Text('lỗi hiển thị: ${snapshot.error}');
+                } else if (snapshot.hasData) {
+                  List<WeatherInfo> weeklyWeather = snapshot.data!;
+                  return Expanded(
+                    child: ListView.builder(
+                      itemCount: weeklyWeather.length,
+                      itemBuilder: (context, index) {
+                        WeatherInfo weatherInfo = weeklyWeather[index];
+                        return Container(
+                          margin: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 5,
+                          ),
+                          padding: const EdgeInsets.all(25),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(30),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.5),
+                                spreadRadius: 2,
+                                blurRadius: 5,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    weatherInfo.day,
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Nhiệt độ: ${weatherInfo.temperature}°C',
+                                    style: const TextStyle(fontSize: 16),
+                                  ),
+                                ],
+                              ),
+                              Icon(
+                                Icons.cloud,
+                                color: Colors.green
+                              ),
+                            ],
+                          ),
+                        );
+                      },
                     ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    // Text(
-                    //   "gi do",
-                    //   style: TextStyle(
-                    //     fontSize: 15,
-                    //   ),
-                    // )
-                  ],
-                )
-              ],
+                  );
+                } else {
+                  return Text('No data available');
+                }
+              },
             ),
-          ),
-          Padding(
-            padding: EdgeInsets.only(
-              bottom: 20,
-              right: 50,
-              left: 50,
-            ),
-            child: Column(
-              children: [
-                Divider(color: Colors.white),
-                SizedBox(
-                  height: 10,
-                ),
-              ],
-            ),
-          )
-        ],
+          ],
+        ),
       ),
     );
   }
 }
 
-class SevenDays extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: ListView.builder(
-          itemCount: 7,
-          itemBuilder: (BuildContext context, int index) {
-            return Padding(
-                padding: EdgeInsets.only(left: 20, right: 20, bottom: 25),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text("days", style: TextStyle(fontSize: 20,color: Colors.white)),
-                    Container(
-                      width: 135,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          // Image.asset(
-                          //   "assets/images/sunny.png",
-                          //   fit: BoxFit.fill,
-                          // ),
-                        ],
-                      ),
-                    ),
-                    Text(
-                      "24°C",
-                      style: TextStyle(fontSize: 20,color: Colors.grey),
-                    ),
-                    // Text(
-                    //   "7 days",
-                    //   style: TextStyle(fontSize: 20, color: Colors.grey),
-                    // )
-                  ],
-                ));
-          }),
+class WeatherInfo {
+  final String day;
+  final double temperature;
+
+  WeatherInfo({required this.day, required this.temperature});
+
+  factory WeatherInfo.fromJson(Map<String, dynamic> json) {
+    // Lấy thời gian từ timestamp
+    DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(json['dt'] * 1000);
+    String formattedDay = '${dateTime.day}/${dateTime.month}';
+
+    return WeatherInfo(
+      day: formattedDay,
+      temperature: json['main']['temp'].toDouble(),
     );
   }
 }
