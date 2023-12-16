@@ -91,7 +91,7 @@ class _CurrentWeatherState extends State<CurrentWeather> {
                     Row(
                       children: [
                         Text(
-                          "Ha Noi",
+                          "${snapshot.data!.name}",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 30,
